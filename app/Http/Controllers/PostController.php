@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Post;
+use App\Http\Resources\PostResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+//use Illuminate\Support\Arr;
 
 class PostController extends Controller
 {
@@ -14,7 +17,7 @@ class PostController extends Controller
      */
     public function index()
     {
-        //
+        return PostResource::collection(Post::latest()->paginate(5));
     }
 
     /**
@@ -35,7 +38,30 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $this->validate($request, [
+            'title' => 'required',
+            'body' => 'required',
+            'user_id' => 'required',
+            'image' => 'required|mimes:jpeg,png,jpg,gif,svg',
+        ]);
+
+        $post = new Post;
+
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $name = str_slug($request->title) . '.' . $image->getClientOriginalExtension();
+            $destinationPath = public_path('/uploads/posts');
+            $imagePath = $destinationPath . "/" . $name;
+            $image->move($destinationPath, $name);
+            $post->image = $name;
+        }
+
+        $post->user_id = $request->user_id;
+        $post->title = $request->title;
+        $post->body = $request->body;
+        $post->save();
+
+        return new PostResource($post);
     }
 
     /**
@@ -46,7 +72,8 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        //
+        //request to this address, http://127.0.0.1:800/api/posts/id, should be resolved by the show() action method
+        return new PostResource($post);
     }
 
     /**
