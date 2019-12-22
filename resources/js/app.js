@@ -11,6 +11,7 @@ import Homepage from './components/Homepage'
 import Create from './components/Create'
 import Read from './components/Read'
 import Update from './components/Update'
+import Comments from './components/Comments'
 
 //window.Vue = require('vue');
 
@@ -65,8 +66,9 @@ const router = new VueRouter({
 
 const app = new Vue({
     el: '#app',
-    router,
     components: {
-        Homepage
+        Homepage,
+        Comments
     },
+    router,
 });
